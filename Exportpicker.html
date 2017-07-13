@@ -1,0 +1,53 @@
+<div class="demo" >
+<style type="text/css"> .demo { margin: 30px ; color : #AAA ; font-family : arial sans-serif ;font-size : 10pt } 
+                            p { color : red ; font-size : 11pt } 
+</style>
+<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/themes/cupertino/jquery-ui.css">
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+
+<p>I will convert your spreadsheet data into events on your calendar:</p>
+
+<p> Choose your calendar: <select name="calendarId" id="calendarId"></select>
+<script>
+
+
+//update options from calendar list
+    var myC = <?!= JSON.stringify(myCals) ?>;
+    console.log(myC);
+    var option = '';
+    for (var i=0;i<myC.length;i++){
+       option += '<option value="'+ myC[i].id + '">' + myC[i].name + '</option>';
+    }
+    $('#calendarId').append(option);
+
+
+// Pass input dates to server-side submitDates()
+function submitExportForm() {
+  var calendarID = $("#calendarId").val();
+  $("div.rond").css("visibility","visible");
+  $("input").prop("disabled", true);
+
+  google.script.run
+        .withSuccessHandler(
+           // Dates delivered, close dialog
+           function() {
+             google.script.host.close();
+           })
+           // Display failure messages
+         .withFailureHandler(
+           function() {
+             var div = $('<div id="error" class="error"> error </div>');
+             $("#demo").append(div);
+           })
+         .putSSEventsOnCalendar(calendarID);
+}
+
+</script>
+<input type="button" value="Create Events onto Calendar from Spreadsheet" onclick="submitExportForm()" />
+<input type="button" value="Back" onclick="google.script.host.close()" />
+<div class="rond" style="visibility: hidden"></div>
+<div class="demiRond1"><div class="demiRond"></div></div>
+<div class="demiRond2"><div class="demiRond"></div></div>
+</div>

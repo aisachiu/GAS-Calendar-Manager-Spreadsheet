@@ -1,0 +1,46 @@
+<div class="demo" >
+<style type="text/css"> .demo { margin: 30px ; color : #AAA ; font-family : arial sans-serif ;font-size : 10pt } 
+                            p { color : red ; font-size : 11pt } 
+</style>
+
+<?!= include("css"); ?>
+<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/themes/cupertino/jquery-ui.css">
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+
+<p>This script deletes all items marked "1" in a delete column G.</p>
+
+<p> Do you wish to continue?</p>
+<script>
+
+// Pass input dates to server-side submitDates()
+function submitYes() {
+  $("div.rond").css("visibility","visible");
+  $("input").prop("disabled", true);
+  google.script.run
+        .withSuccessHandler(
+           // Dates delivered, close dialog
+           function() {
+             google.script.host.close();
+           })
+           // Display failure messages
+         .withFailureHandler(
+           function() {
+             var div = $('<div id="error" class="error"> error </div>');
+             $("#demo").append(div);
+           })
+         .deleteMarkedEvents();
+}
+
+function submitNo(){
+  google.script.host.close();
+}
+
+</script>
+<input type="button" value="Cancel" onclick="submitNo()" /><input type="button" value="Yes" onclick="submitYes()" />
+<div class="rond" style="visibility: hidden"></div>
+<div class="demiRond1"><div class="demiRond"></div></div>
+<div class="demiRond2"><div class="demiRond"></div></div>
+
+</div>
