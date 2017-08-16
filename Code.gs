@@ -54,7 +54,7 @@ function showDeleteMarkedDialog() {
 
 function makeTemplateForExport(){
   var mySpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  mySpreadsheet.getSheetByName("CreateCalendarEventsTemplate").copyTo(mySpreadsheet);
+  mySpreadsheet.setActiveSheet(mySpreadsheet.getSheetByName("CreateCalendarEventsTemplate").copyTo(mySpreadsheet).showSheet());
 }
 
 
@@ -90,11 +90,11 @@ function putCalEventsOnSS(myCalID, startDateTxt, endDateTxt) {
   var myEvts = myCal.getEvents(new Date(startDateTxt), new Date(endDateTxt));
   
   var EventsArray = new Array();
-  EventsArray.push(["Title", "Creator", "Start", "End", "Event ID", "Calendar ID"]);
+  EventsArray.push(["Title", "Creator", "Start", "End", "Event ID", "Calendar ID", "Delete? (1=mark for delete)"]);
   
   for (var i=0; i<myEvts.length;i++){
     //var myLink = "https://www.googleapis.com/calendar/v3/calendars/"+ myCalID1 + "/events/" + myEvts[i].getId();
-    EventsArray.push([  myEvts[i].getTitle(), myEvts[i].getCreators().toString(),myEvts[i].getStartTime(),myEvts[i].getEndTime(),myEvts[i].getId(), myCalID]);
+    EventsArray.push([  myEvts[i].getTitle(), myEvts[i].getCreators().toString(),myEvts[i].getStartTime(),myEvts[i].getEndTime(),myEvts[i].getId(), myCalID, ""]);
   }
   //write to Spreadsheet
   var mySheet = SpreadsheetApp.getActive().insertSheet();
@@ -174,7 +174,7 @@ function deleteMarkedEvents(){
     }
     if(i%sleepInterval ==0) { Utilities.sleep(sleepTime); } //pause the script momentarily to avoid GCalendar overload error
   }
-  var mySheet = SpreadsheetApp.getActive().insertSheet("Deleted " & new Date());
+  var mySheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet("Deleted " & new Date());
   var writeData = mySheet.getRange(1, 1, myActions.length, myActions[0].length).setValues(myActions);
 
 }
@@ -197,12 +197,12 @@ function putSSEventsOnCalendar(calID){
     if(myData[i][1] == "") {continue;} //if title is blank, skip the row.
     if(myData[i][3] == "") { action = 1}; //if endDate is blank, assume it is an all-day event
     try{
-      if(action = 0){
+      if(action == 0){
         myEventID = myCal.createEvent(myData[i][1], new Date(myData[i][2]), new Date(myData[i][3]),
                                               {description: myData[i][4], location: myData[i][5], guests: myData[i][6]}).getEventSeries().getId(); //save eventID to write to sheet
   //Create normal event
       }
-      if(action = 1){ //create all day event
+      if(action == 1){ //create all day event
         myEventID = myCal.createAllDayEvent(myData[i][1], new Date(myData[i][2]),
                                               {description: myData[i][4], location: myData[i][5], guests: myData[i][6]}).getEventSeries().getId(); //save eventID to write to sheet
       }
